@@ -12,12 +12,15 @@ if (process.defaultApp) {
   app.setAsDefaultProtocolClient('lockdown');
 }
 
-function createLockdownWindow(quizUrl = 'https://your-quiz-site.com') {
+function createLockdownWindow(quizUrl = 'https://crowdquiz.vercel.app/') {
   mainWindow = new BrowserWindow({
     fullscreen: true,
-    kiosk: true,              // Locks the PC screen
-    alwaysOnTop: true,        // Stays above all windows
-    skipTaskbar: true,        // Hides from taskbar
+    // Locks the PC screen
+    kiosk: true,      
+    // Stays above all windows        
+    alwaysOnTop: true,       
+    // Hides from taskbar 
+    skipTaskbar: true,        
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -25,7 +28,6 @@ function createLockdownWindow(quizUrl = 'https://your-quiz-site.com') {
     }
   });
 
-  // Set a Custom User Agent so your website knows it's the secure app
   mainWindow.loadURL(quizUrl, { userAgent: 'SECURE_LOCKDOWN_v1' });
 
   // Disable Developer Tools
@@ -34,22 +36,19 @@ function createLockdownWindow(quizUrl = 'https://your-quiz-site.com') {
   });
 }
 
-// 2. Block Keyboard Shortcuts (Alt+Tab, Ctrl+Esc, etc.)
+// 2. Block Keyboard Shortcuts 
 app.on('ready', () => {
   createLockdownWindow();
 
-  // Register shortcuts to block common exit/switch keys
   globalShortcut.register('Alt+Tab', () => { return false; });
   globalShortcut.register('CommandOrControl+R', () => { return false; });
   globalShortcut.register('Alt+F4', () => { return false; });
 });
 
-// 3. Listen for "Exit" signal from the Website
 ipcMain.on('close-app', () => {
   app.quit();
 });
 
-// Ensure only one instance runs
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
@@ -59,7 +58,6 @@ if (!gotTheLock) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
       
-      // Extract URL from deep link: lockdown://start?url=...
       const url = commandLine.pop();
       console.log("Opening Quiz:", url);
     }
